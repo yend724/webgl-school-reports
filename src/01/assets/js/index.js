@@ -111,7 +111,7 @@ class App3 {
 
   init() {
     // レンダラー
-    this.renderer = new THREE.WebGLRenderer();
+    this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setClearColor(
       new THREE.Color(App3.RENDERER_PARAM.clearColor)
     );
