@@ -115,6 +115,7 @@ class App3 {
     this.renderer.setClearColor(
       new THREE.Color(App3.RENDERER_PARAM.clearColor)
     );
+    this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.setSize(
       App3.RENDERER_PARAM.width,
       App3.RENDERER_PARAM.height
