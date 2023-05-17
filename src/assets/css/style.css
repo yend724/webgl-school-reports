@@ -1,0 +1,7 @@
+a {
+  color: LinkText;
+  text-decoration: underline;
+}
+a:hover {
+  text-decoration: none;
+}
