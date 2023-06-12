@@ -10,6 +10,7 @@ export default {
       input: {
         index: path.resolve(dirname, 'src', 'index.html'),
         '01': path.resolve(dirname, 'src', '01/index.html'),
+        '02': path.resolve(dirname, 'src', '02/index.html'),
       },
     },
   },
