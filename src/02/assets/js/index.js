@@ -103,7 +103,7 @@ class App3 {
     this.bladeMaterial; // 扇風機のマテリアル
     this.controls; // オービットコントロール
     this.planeGroup; // プレーンのグループ
-    this.bladeGroupBlade; // 扇風機の羽グループ
+    this.bladeGroup; // 扇風機の羽グループ
     this.centerGroup; // 扇風機の羽の軸グループ
     this.texture; // テクスチャ
     this.composer; // エフェクトコンポーザー
