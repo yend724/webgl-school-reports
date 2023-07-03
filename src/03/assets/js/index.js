@@ -72,7 +72,11 @@ class App3 {
   }
   static get AIRPLANE_MATERIAL_PAEAMS() {
     return {
-      color: 0xffff00, // 飛行機の色
+      color: {
+        red: 0xff0000,
+        green: 0x00ff00,
+        blue: 0x0000ff,
+      },
     };
   }
   /**
@@ -87,7 +91,11 @@ class App3 {
   }
 
   static get AIRPLANE_NUMS() {
-    return 33;
+    return {
+      red: 3,
+      green: 4,
+      blue: 5,
+    };
   }
 
   /**
@@ -107,9 +115,7 @@ class App3 {
     this.earthTexture; // 地球テクスチャ
     this.airplaneArray; // 飛行機の配列
     this.airplaneDirectionArray; // 飛行機の向きの配列
-    this.airplaneTarget; // 飛行機の向き先
-
-    // this.isDown = false; // キーの押下状態を保持するフラグ
+    this.airplaneTargets; // 飛行機の向き先配列
 
     // Clock オブジェクトの生成
     this.clock = new THREE.Clock();
@@ -193,15 +199,24 @@ class App3 {
     );
     this.scene.add(this.directionalLight);
 
+    const colors = ['red', 'green', 'blue'];
+
     // 点光源
-    this.pointLight = new THREE.PointLight(
-      App3.AIRPLANE_MATERIAL_PAEAMS.color,
-      2,
-      50,
-      1.0
-    );
-    this.pointLight.position.set(0.0, 0, 5.0);
-    this.scene.add(this.pointLight);
+    this.pointLights = {
+      red: null,
+      green: null,
+      blue: null,
+    };
+    for (const color of colors) {
+      this.pointLights[color] = new THREE.PointLight(
+        App3.AIRPLANE_MATERIAL_PAEAMS['color'][color],
+        2,
+        50,
+        1.0
+      );
+      this.pointLights[color].position.set(0.0, 0, 5.0);
+      this.scene.add(this.pointLights[color]);
+    }
 
     // アンビエントライト（環境光）
     this.ambientLight = new THREE.AmbientLight(
@@ -225,48 +240,75 @@ class App3 {
     this.group.add(this.earth);
 
     // 飛行機の追いかけ先
+    this.airplaneTargets = {
+      red: null,
+      green: null,
+      blue: null,
+    };
     const airplaneTargetGeometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
     const airplaneTargetMaterial = new THREE.MeshNormalMaterial();
-    this.airplaneTarget = new THREE.Mesh(
-      airplaneTargetGeometry,
-      airplaneTargetMaterial
-    );
-    this.scene.add(this.airplaneTarget);
-    this.airplaneTarget.visible = false;
 
-    this.airplaneArray = [];
-    this.airplaneDirectionArray = [];
+    for (const color of colors) {
+      this.airplaneTargets[color] = new THREE.Mesh(
+        airplaneTargetGeometry,
+        airplaneTargetMaterial
+      );
+      this.scene.add(this.airplaneTargets[color]);
+      this.airplaneTargets[color].visible = false;
+    }
+
+    this.airplaneArray = {
+      red: [],
+      green: [],
+      blue: [],
+    };
+    this.airplaneDirectionArray = {
+      red: [],
+      green: [],
+      blue: [],
+    };
     const direction = new THREE.Vector3(0.0, 1.0, 0.0).normalize();
-    for (let i = 0; i < App3.AIRPLANE_NUMS; i++) {
-      // 飛行機のメッシュ
-      const airplane = this.createAirplane();
-      this.airplaneArray.push(airplane);
-      this.scene.add(airplane);
-      // 飛行機の向き
-      this.airplaneDirectionArray.push(direction);
+
+    for (const color of colors) {
+      for (let i = 0; i < App3.AIRPLANE_NUMS[color]; i++) {
+        // 飛行機のメッシュ
+        const airplane = this.createAirplane(color);
+        this.airplaneArray[color].push(airplane);
+        this.scene.add(airplane);
+        // 飛行機の向き
+        this.airplaneDirectionArray[color].push(direction);
+      }
     }
 
     // コントロール
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-
-    // ヘルパー
-    // const axesBarLength = 5.0;
-    // this.axesHelper = new THREE.AxesHelper(axesBarLength);
-    // this.scene.add(this.axesHelper);
   }
 
-  createAirplane = () => {
+  createAirplane = color => {
     const airplaneGeometry = new THREE.ConeGeometry(0.1, 0.25, 32);
-    const airplaneMaterial = new THREE.MeshBasicMaterial(
-      App3.AIRPLANE_MATERIAL_PAEAMS
-    );
+    const airplaneMaterial = new THREE.MeshBasicMaterial({
+      color: App3.AIRPLANE_MATERIAL_PAEAMS['color'][color],
+    });
     return new THREE.Mesh(airplaneGeometry, airplaneMaterial);
   };
 
-  getVec3Position = time => {
-    const x = Math.cos(time);
-    const y = Math.sin(time);
-    const z = Math.sin(time * 2);
+  getVec3Position = (_time, color) => {
+    const time = _time;
+    let x, y, z;
+    if (color === 'red') {
+      x = Math.cos(time);
+      y = Math.sin(time);
+      z = Math.sin(time * 2);
+    } else if (color === 'green') {
+      x = Math.cos(time * -2 + 1);
+      y = Math.sin(time + 1);
+      z = Math.cos(time + 1);
+    } else if (color === 'blue') {
+      x = Math.cos(time + 2);
+      y = Math.sin(time * -2 + 2);
+      z = Math.sin(time + 2);
+    }
+
     return new THREE.Vector3(x, y, z).normalize();
   };
   setVec3Position(_mesh, vec3) {
@@ -304,47 +346,60 @@ class App3 {
     this.controls.update();
     this.renderer.render(this.scene, this.camera);
 
-    const r = 3.01;
+    const r = 3.05;
     const elapsedTime = this.clock.getElapsedTime();
     const deltaTime = 0.1;
 
-    // pointLightのポジション
-    const pointVec3Position =
-      this.getVec3Position(elapsedTime).multiplyScalar(r);
-    this.setVec3Position(this.pointLight, pointVec3Position);
+    // 3色
+    const colors = ['red', 'green', 'blue'];
+    for (const color of colors) {
+      // pointLightsのポジション
+      const pointVec3Position = this.getVec3Position(
+        elapsedTime,
+        color
+      ).multiplyScalar(r);
+      this.setVec3Position(this.pointLights[color], pointVec3Position);
 
-    // airplaneTargetのポジション
-    const airplaneTargetVec3Position = this.getVec3Position(
-      elapsedTime
-    ).multiplyScalar(r + 0.5);
-    this.setVec3Position(this.airplaneTarget, airplaneTargetVec3Position);
-
-    const airplaneNums = this.airplaneArray.length;
-    console.log(elapsedTime);
-    for (let i = 0; i < airplaneNums; i++) {
-      const time = elapsedTime - deltaTime * (i + 1);
-      const airplaneVec3Position = this.getVec3Position(time).multiplyScalar(
-        r + 0.5
-      );
-      this.setVec3Position(this.airplaneArray[i], airplaneVec3Position);
-
-      const previousDirection = this.airplaneDirectionArray[i].clone();
-      const prevPosition =
-        i - 1 > 0
-          ? this.airplaneArray[i - 1].position
-          : airplaneTargetVec3Position;
-
-      this.airplaneDirectionArray[i] = this.calcNextDirection(
-        prevPosition,
-        this.airplaneArray[i].position
+      // airplaneTargetsのポジション
+      const airplaneTargetVec3Position = this.getVec3Position(
+        elapsedTime,
+        color
+      ).multiplyScalar(r + 0.5);
+      this.setVec3Position(
+        this.airplaneTargets[color],
+        airplaneTargetVec3Position
       );
 
-      const qtn = this.calcQuaternion(
-        previousDirection,
-        this.airplaneDirectionArray[i]
-      );
+      const airplaneNums = this.airplaneArray[color].length;
+      for (let i = 0; i < airplaneNums; i++) {
+        const time = elapsedTime - deltaTime * (i + 3);
+        const airplaneVec3Position = this.getVec3Position(
+          time,
+          color
+        ).multiplyScalar(r + 0.5);
+        this.setVec3Position(
+          this.airplaneArray[color][i],
+          airplaneVec3Position
+        );
 
-      this.airplaneArray[i].quaternion.premultiply(qtn);
+        const previousDirection = this.airplaneDirectionArray[color][i].clone();
+        const prevPosition =
+          i - 1 > 0
+            ? this.airplaneArray[color][i - 1].position
+            : airplaneTargetVec3Position;
+
+        this.airplaneDirectionArray[color][i] = this.calcNextDirection(
+          prevPosition,
+          this.airplaneArray[color][i].position
+        );
+
+        const qtn = this.calcQuaternion(
+          previousDirection,
+          this.airplaneDirectionArray[color][i]
+        );
+
+        this.airplaneArray[color][i].quaternion.premultiply(qtn);
+      }
     }
 
     // 地球の時点
