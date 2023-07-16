@@ -4,6 +4,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import objFoxPath from '../obj/Fox.glb?url';
 
 const isTouchEvent = 'ontouchstart' in window;
+console.log(isTouchEvent);
 
 // DOM がパースされたことを検出するイベントで App3 クラスをインスタンス化する
 window.addEventListener(
@@ -33,7 +34,7 @@ class App3 {
       far: 80.0,
       x: 0.0,
       y: 25.0,
-      z: 20.0,
+      z: 25.0,
       lookAt: new THREE.Vector3(0.0, 0.0, 0.0),
     };
   }
@@ -119,7 +120,7 @@ class App3 {
     this.raycaster = new THREE.Raycaster();
     // マウスのポインタイベントの定義
     window.addEventListener(
-      isTouchEvent ? 'touchstart' : 'click',
+      isTouchEvent ? 'pointerup' : 'click',
       mouseEvent => {
         // スクリーン空間の座標系をレイキャスター用に正規化する（-1.0 ~ 1.0 の範囲）
         const x = (mouseEvent.clientX / window.innerWidth) * 2.0 - 1.0;
@@ -140,7 +141,7 @@ class App3 {
       false
     );
     window.addEventListener(
-      'mousemove',
+      'pointermove',
       mouseEvent => {
         // スクリーン空間の座標系をレイキャスター用に正規化する（-1.0 ~ 1.0 の範囲）
         const x = (mouseEvent.clientX / window.innerWidth) * 2.0 - 1.0;
@@ -315,6 +316,14 @@ class App3 {
 
     // コントロール
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+    const vector = new THREE.Vector3(
+      App3.CAMERA_PARAM.x,
+      App3.CAMERA_PARAM.y,
+      App3.CAMERA_PARAM.z
+    );
+    const cameraLenght = vector.length();
+    this.controls.maxDistance = cameraLenght;
+    this.controls.minDistance = cameraLenght;
 
     // シーンに glTF を追加
     const SCALE = 0.03;
