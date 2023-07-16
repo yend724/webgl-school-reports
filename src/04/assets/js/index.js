@@ -28,9 +28,9 @@ class App3 {
       fovy: 60,
       aspect: window.innerWidth / window.innerHeight,
       near: 0.1,
-      far: 100.0,
+      far: 80.0,
       x: 0.0,
-      y: 20.0,
+      y: 25.0,
       z: 20.0,
       lookAt: new THREE.Vector3(0.0, 0.0, 0.0),
     };
