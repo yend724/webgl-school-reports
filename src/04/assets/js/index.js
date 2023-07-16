@@ -4,7 +4,6 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import objFoxPath from '../obj/Fox.glb?url';
 
 const isTouchEvent = 'ontouchstart' in window;
-console.log(isTouchEvent);
 
 // DOM がパースされたことを検出するイベントで App3 クラスをインスタンス化する
 window.addEventListener(
@@ -120,13 +119,15 @@ class App3 {
     this.raycaster = new THREE.Raycaster();
     // マウスのポインタイベントの定義
     window.addEventListener(
-      isTouchEvent ? 'pointerup' : 'click',
+      'click',
       mouseEvent => {
         // スクリーン空間の座標系をレイキャスター用に正規化する（-1.0 ~ 1.0 の範囲）
         const x = (mouseEvent.clientX / window.innerWidth) * 2.0 - 1.0;
         const y = (mouseEvent.clientY / window.innerHeight) * 2.0 - 1.0;
         // スクリーン空間は上下が反転している点に注意（Y だけ符号を反転させる）
         const v = new THREE.Vector2(x, -y);
+        // レイキャスターに正規化済みマウス座標とカメラを指定する
+        this.raycaster.setFromCamera(v, this.camera);
         // scene に含まれるすべてのオブジェクトを対象にレイキャストする
         const intersects = this.raycaster.intersectObjects(this.planeArray);
         // レイが交差しなかった場合を考慮し一度マテリアルをリセットしておく
@@ -140,33 +141,35 @@ class App3 {
       },
       false
     );
-    window.addEventListener(
-      'pointermove',
-      mouseEvent => {
-        // スクリーン空間の座標系をレイキャスター用に正規化する（-1.0 ~ 1.0 の範囲）
-        const x = (mouseEvent.clientX / window.innerWidth) * 2.0 - 1.0;
-        const y = (mouseEvent.clientY / window.innerHeight) * 2.0 - 1.0;
-        // スクリーン空間は上下が反転している点に注意（Y だけ符号を反転させる）
-        const v = new THREE.Vector2(x, -y);
-        // レイキャスターに正規化済みマウス座標とカメラを指定する
-        this.raycaster.setFromCamera(v, this.camera);
-        // scene に含まれるすべてのオブジェクトを対象にレイキャストする
-        const intersects = this.raycaster.intersectObjects(this.planeArray);
-        document.body.style = 'cursor:auto';
-        this.planeArray.forEach(mesh => {
-          if (this.selectedMesh.uuid !== mesh.uuid) {
-            mesh.material = this.material;
+    if (!isTouchEvent) {
+      window.addEventListener(
+        'pointermove',
+        mouseEvent => {
+          // スクリーン空間の座標系をレイキャスター用に正規化する（-1.0 ~ 1.0 の範囲）
+          const x = (mouseEvent.clientX / window.innerWidth) * 2.0 - 1.0;
+          const y = (mouseEvent.clientY / window.innerHeight) * 2.0 - 1.0;
+          // スクリーン空間は上下が反転している点に注意（Y だけ符号を反転させる）
+          const v = new THREE.Vector2(x, -y);
+          // レイキャスターに正規化済みマウス座標とカメラを指定する
+          this.raycaster.setFromCamera(v, this.camera);
+          // scene に含まれるすべてのオブジェクトを対象にレイキャストする
+          const intersects = this.raycaster.intersectObjects(this.planeArray);
+          document.body.style = 'cursor:auto';
+          this.planeArray.forEach(mesh => {
+            if (this.selectedMesh.uuid !== mesh.uuid) {
+              mesh.material = this.material;
+            }
+          });
+          if (intersects.length > 0) {
+            document.body.style = 'cursor:pointer';
+            if (this.selectedMesh.uuid !== intersects[0].object.uuid) {
+              intersects[0].object.material = this.hitMaterial;
+            }
           }
-        });
-        if (intersects.length > 0) {
-          document.body.style = 'cursor:pointer';
-          if (this.selectedMesh.uuid !== intersects[0].object.uuid) {
-            intersects[0].object.material = this.hitMaterial;
-          }
-        }
-      },
-      false
-    );
+        },
+        false
+      );
+    }
 
     // 再帰呼び出しのための this 固定
     this.render = this.render.bind(this);
