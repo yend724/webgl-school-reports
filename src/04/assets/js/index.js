@@ -119,7 +119,7 @@ class App3 {
     this.raycaster = new THREE.Raycaster();
     // マウスのポインタイベントの定義
     window.addEventListener(
-      'click',
+      isTouchEvent ? 'pointerdown' : 'click',
       mouseEvent => {
         // スクリーン空間の座標系をレイキャスター用に正規化する（-1.0 ~ 1.0 の範囲）
         const x = (mouseEvent.clientX / window.innerWidth) * 2.0 - 1.0;
@@ -319,14 +319,8 @@ class App3 {
 
     // コントロール
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-    const vector = new THREE.Vector3(
-      App3.CAMERA_PARAM.x,
-      App3.CAMERA_PARAM.y,
-      App3.CAMERA_PARAM.z
-    );
-    const cameraLenght = vector.length();
-    this.controls.maxDistance = cameraLenght;
-    this.controls.minDistance = cameraLenght;
+    this.controls.maxDistance = 60;
+    this.controls.minDistance = 20;
 
     // シーンに glTF を追加
     const SCALE = 0.03;
