@@ -3,6 +3,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import objFoxPath from '../obj/Fox.glb?url';
 
+const isTouchEvent = 'ontouchstart' in window;
+
 // DOM がパースされたことを検出するイベントで App3 クラスをインスタンス化する
 window.addEventListener(
   'DOMContentLoaded',
@@ -117,7 +119,7 @@ class App3 {
     this.raycaster = new THREE.Raycaster();
     // マウスのポインタイベントの定義
     window.addEventListener(
-      'click',
+      isTouchEvent ? 'touchstart' : 'click',
       mouseEvent => {
         // スクリーン空間の座標系をレイキャスター用に正規化する（-1.0 ~ 1.0 の範囲）
         const x = (mouseEvent.clientX / window.innerWidth) * 2.0 - 1.0;
@@ -138,7 +140,7 @@ class App3 {
       false
     );
     window.addEventListener(
-      'pointermove',
+      'mousemove',
       mouseEvent => {
         // スクリーン空間の座標系をレイキャスター用に正規化する（-1.0 ~ 1.0 の範囲）
         const x = (mouseEvent.clientX / window.innerWidth) * 2.0 - 1.0;
