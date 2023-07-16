@@ -12,6 +12,7 @@ export default {
         '01': path.resolve(dirname, 'src', '01/index.html'),
         '02': path.resolve(dirname, 'src', '02/index.html'),
         '03': path.resolve(dirname, 'src', '03/index.html'),
+        '04': path.resolve(dirname, 'src', '03/index.html'),
       },
     },
   },
