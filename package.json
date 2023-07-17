@@ -9,7 +9,8 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "vite": "^4.3.2"
+    "vite": "^4.3.2",
+    "vite-plugin-glsl": "^1.1.2"
   },
   "dependencies": {
     "destyle.css": "^4.0.0",

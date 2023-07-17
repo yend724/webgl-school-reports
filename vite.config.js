@@ -1,4 +1,5 @@
 import path from 'path';
+import glsl from 'vite-plugin-glsl';
 
 const dirname = path.dirname(new URL(import.meta.url).pathname);
 
@@ -13,7 +14,9 @@ export default {
         '02': path.resolve(dirname, 'src', '02/index.html'),
         '03': path.resolve(dirname, 'src', '03/index.html'),
         '04': path.resolve(dirname, 'src', '04/index.html'),
+        '05': path.resolve(dirname, 'src', '05/index.html'),
       },
     },
   },
+  plugins: [glsl()],
 };

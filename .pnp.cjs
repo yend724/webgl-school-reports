@@ -28,7 +28,8 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["destyle.css", "npm:4.0.0"],\
           ["three", "npm:0.152.2"],\
-          ["vite", "virtual:17de1c3f4cc15ba61210f3ea9cd203f1a29c26b8242b5e266d38d90368077e2465c146fd9da05e11775b5f32e0a38fbc440c7f26f8811cf75b780717be274e49#npm:4.4.2"]\
+          ["vite", "virtual:17de1c3f4cc15ba61210f3ea9cd203f1a29c26b8242b5e266d38d90368077e2465c146fd9da05e11775b5f32e0a38fbc440c7f26f8811cf75b780717be274e49#npm:4.4.2"],\
+          ["vite-plugin-glsl", "virtual:17de1c3f4cc15ba61210f3ea9cd203f1a29c26b8242b5e266d38d90368077e2465c146fd9da05e11775b5f32e0a38fbc440c7f26f8811cf75b780717be274e49#npm:1.1.2"]\
         ],\
         "linkType": "SOFT"\
       }]\
@@ -274,11 +275,45 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["@rollup/pluginutils", [\
+      ["npm:5.0.2", {\
+        "packageLocation": "../../../../../.yarn/berry/cache/@rollup-pluginutils-npm-5.0.2-6aa9d0ddd4-10.zip/node_modules/@rollup/pluginutils/",\
+        "packageDependencies": [\
+          ["@rollup/pluginutils", "npm:5.0.2"]\
+        ],\
+        "linkType": "SOFT"\
+      }],\
+      ["virtual:90399e877eea61622e60d8bae66425d6539b7aaab943c0204d74c66072827008f6dbef79c2acb5a36f40940387ab6ae27564ecab5215522488462ecaf69c7b13#npm:5.0.2", {\
+        "packageLocation": "./.yarn/__virtual__/@rollup-pluginutils-virtual-2452afa3f3/6/.yarn/berry/cache/@rollup-pluginutils-npm-5.0.2-6aa9d0ddd4-10.zip/node_modules/@rollup/pluginutils/",\
+        "packageDependencies": [\
+          ["@rollup/pluginutils", "virtual:90399e877eea61622e60d8bae66425d6539b7aaab943c0204d74c66072827008f6dbef79c2acb5a36f40940387ab6ae27564ecab5215522488462ecaf69c7b13#npm:5.0.2"],\
+          ["@types/estree", "npm:1.0.1"],\
+          ["@types/rollup", null],\
+          ["estree-walker", "npm:2.0.2"],\
+          ["picomatch", "npm:2.3.1"],\
+          ["rollup", null]\
+        ],\
+        "packagePeers": [\
+          "@types/rollup",\
+          "rollup"\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["@tootallnate/once", [\
       ["npm:2.0.0", {\
         "packageLocation": "../../../../../.yarn/berry/cache/@tootallnate-once-npm-2.0.0-e36cf4f140-10.zip/node_modules/@tootallnate/once/",\
         "packageDependencies": [\
           ["@tootallnate/once", "npm:2.0.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@types/estree", [\
+      ["npm:1.0.1", {\
+        "packageLocation": "../../../../../.yarn/berry/cache/@types-estree-npm-1.0.1-4c9469c165-10.zip/node_modules/@types/estree/",\
+        "packageDependencies": [\
+          ["@types/estree", "npm:1.0.1"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -633,6 +668,15 @@ const RAW_RUNTIME_STATE =
           ["@esbuild/win32-arm64", "npm:0.18.11"],\
           ["@esbuild/win32-ia32", "npm:0.18.11"],\
           ["@esbuild/win32-x64", "npm:0.18.11"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["estree-walker", [\
+      ["npm:2.0.2", {\
+        "packageLocation": "../../../../../.yarn/berry/cache/estree-walker-npm-2.0.2-dfab42f65c-10.zip/node_modules/estree-walker/",\
+        "packageDependencies": [\
+          ["estree-walker", "npm:2.0.2"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -1191,6 +1235,15 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["picomatch", [\
+      ["npm:2.3.1", {\
+        "packageLocation": "../../../../../.yarn/berry/cache/picomatch-npm-2.3.1-c782cfd986-10.zip/node_modules/picomatch/",\
+        "packageDependencies": [\
+          ["picomatch", "npm:2.3.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["postcss", [\
       ["npm:8.4.25", {\
         "packageLocation": "../../../../../.yarn/berry/cache/postcss-npm-8.4.25-c990ab80d8-10.zip/node_modules/postcss/",\
@@ -1529,6 +1582,29 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["vite-plugin-glsl", [\
+      ["npm:1.1.2", {\
+        "packageLocation": "../../../../../.yarn/berry/cache/vite-plugin-glsl-npm-1.1.2-0419b62c65-10.zip/node_modules/vite-plugin-glsl/",\
+        "packageDependencies": [\
+          ["vite-plugin-glsl", "npm:1.1.2"]\
+        ],\
+        "linkType": "SOFT"\
+      }],\
+      ["virtual:17de1c3f4cc15ba61210f3ea9cd203f1a29c26b8242b5e266d38d90368077e2465c146fd9da05e11775b5f32e0a38fbc440c7f26f8811cf75b780717be274e49#npm:1.1.2", {\
+        "packageLocation": "./.yarn/__virtual__/vite-plugin-glsl-virtual-90399e877e/6/.yarn/berry/cache/vite-plugin-glsl-npm-1.1.2-0419b62c65-10.zip/node_modules/vite-plugin-glsl/",\
+        "packageDependencies": [\
+          ["vite-plugin-glsl", "virtual:17de1c3f4cc15ba61210f3ea9cd203f1a29c26b8242b5e266d38d90368077e2465c146fd9da05e11775b5f32e0a38fbc440c7f26f8811cf75b780717be274e49#npm:1.1.2"],\
+          ["@rollup/pluginutils", "virtual:90399e877eea61622e60d8bae66425d6539b7aaab943c0204d74c66072827008f6dbef79c2acb5a36f40940387ab6ae27564ecab5215522488462ecaf69c7b13#npm:5.0.2"],\
+          ["@types/vite", null],\
+          ["vite", "virtual:17de1c3f4cc15ba61210f3ea9cd203f1a29c26b8242b5e266d38d90368077e2465c146fd9da05e11775b5f32e0a38fbc440c7f26f8811cf75b780717be274e49#npm:4.4.2"]\
+        ],\
+        "packagePeers": [\
+          "@types/vite",\
+          "vite"\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["webgl-school-reports", [\
       ["workspace:.", {\
         "packageLocation": "./",\
@@ -1536,7 +1612,8 @@ const RAW_RUNTIME_STATE =
           ["webgl-school-reports", "workspace:."],\
           ["destyle.css", "npm:4.0.0"],\
           ["three", "npm:0.152.2"],\
-          ["vite", "virtual:17de1c3f4cc15ba61210f3ea9cd203f1a29c26b8242b5e266d38d90368077e2465c146fd9da05e11775b5f32e0a38fbc440c7f26f8811cf75b780717be274e49#npm:4.4.2"]\
+          ["vite", "virtual:17de1c3f4cc15ba61210f3ea9cd203f1a29c26b8242b5e266d38d90368077e2465c146fd9da05e11775b5f32e0a38fbc440c7f26f8811cf75b780717be274e49#npm:4.4.2"],\
+          ["vite-plugin-glsl", "virtual:17de1c3f4cc15ba61210f3ea9cd203f1a29c26b8242b5e266d38d90368077e2465c146fd9da05e11775b5f32e0a38fbc440c7f26f8811cf75b780717be274e49#npm:1.1.2"]\
         ],\
         "linkType": "SOFT"\
       }]\
