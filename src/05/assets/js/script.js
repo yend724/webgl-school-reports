@@ -167,37 +167,48 @@ class App {
    * 頂点属性（頂点ジオメトリ）のセットアップを行う
    */
   setupGeometry() {
+    const start = 90;
     // 頂点座標の定義
+    const degree = (Math.PI * 2) / 360;
+    const n1 = start * degree;
+    const n2 = (start + 72) * degree;
+    const n3 = (start + 72 * 2) * degree;
+    const n4 = (start + 72 * 3) * degree;
+    const n5 = (start - 72) * degree;
+    // prettier-ignore
     this.position = [
-      0.0,
-      0.5,
-      0.0, // ひとつ目の頂点の x, y, z 座標
-      0.5,
-      -0.5,
-      0.0, // ふたつ目の頂点の x, y, z 座標
-      -0.5,
-      -0.5,
-      0.0, // みっつ目の頂点の x, y, z 座標
+      Math.cos(n1), Math.sin(n1), 0.0,
+      Math.cos(n2), Math.sin(n2), 0.0,
+      Math.cos(n5), Math.sin(n5), 0.0, // 1つ目の三角形
+      Math.cos(n2), Math.sin(n2), 0.0,
+      Math.cos(n3), Math.sin(n3), 0.0,
+      Math.cos(n5), Math.sin(n5), 0.0, // 2つ目の三角形
+      Math.cos(n3), Math.sin(n3), 0.0,
+      Math.cos(n4), Math.sin(n4), 0.0,
+      Math.cos(n5), Math.sin(n5), 0.0, // 3つ目の三角形
     ];
     // 要素数は XYZ の３つ
     this.positionStride = 3;
     // VBO を生成
     this.positionVBO = WebGLUtility.createVBO(this.gl, this.position);
 
+    const RED = [1.0, 0.0, 0.0, 1.0];
+    const GREEN = [0.0, 1.0, 0.0, 1.0];
+    const BLUE = [0.0, 0.0, 1.0, 1.0];
+    const YELLOW = [1.0, 1.0, 0.0, 1.0];
+    const PURPLE = [1.0, 0.0, 1.0, 1.0];
     // 頂点の色の定義
+    // prettier-ignore
     this.color = [
-      1.0,
-      0.0,
-      0.0,
-      1.0, // ひとつ目の頂点の r, g, b, a カラー
-      0.0,
-      1.0,
-      0.0,
-      1.0, // ふたつ目の頂点の r, g, b, a カラー
-      0.0,
-      0.0,
-      1.0,
-      1.0, // みっつ目の頂点の r, g, b, a カラー
+      ...RED,
+      ...GREEN,
+      ...PURPLE,  // 1つ目の三角形
+      ...GREEN,
+      ...YELLOW,
+      ...PURPLE,  // 2つ目の三角形
+      ...YELLOW,
+      ...BLUE,
+      ...PURPLE  // 3つ目の三角形
     ];
     // 要素数は RGBA の４つ
     this.colorStride = 4;
