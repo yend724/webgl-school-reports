@@ -16,9 +16,63 @@
         display: block;
         margin: auto;
       }
+      .selectbox {
+        position: absolute;
+      }
+      .selectbox::before,
+      .selectbox::after {
+        position: absolute;
+        content: '';
+        pointer-events: none;
+      }
+      .selectbox::before {
+        display: inline-block;
+        right: 0;
+        width: 2.8em;
+        height: 2.8em;
+        border-radius: 0 3px 3px 0;
+        background-color: #2589d0;
+      }
+      .selectbox::after {
+        position: absolute;
+        top: 50%;
+        right: 1.4em;
+        transform: translate(50%, -50%) rotate(45deg);
+        width: 6px;
+        height: 6px;
+        border-bottom: 3px solid #fff;
+        border-right: 3px solid #fff;
+      }
+      .selectbox select {
+        appearance: none;
+        min-width: 230px;
+        height: 2.8em;
+        padding: 0.4em 3.6em 0.4em 0.8em;
+        border: none;
+        border-radius: 3px;
+        background-color: #e6edf3;
+        color: #333;
+        font-size: 1em;
+        cursor: pointer;
+      }
+
+      .selectbox select:focus {
+        outline: 2px solid #2589d0;
+      }
     </style>
   </head>
   <body>
     <canvas id="webgl-canvas"></canvas>
+    <div class="selectbox">
+      <select name="mode" id="mode" class="mode">
+        <!-- <option value="POINTS">gl.POINTS</option> -->
+        <option value="LINE_STRIP">gl.LINE_STRIP</option>
+        <option value="LINE_LOOP">gl.LINE_LOOP</option>
+        <option value="LINES">gl.LINES</option>
+        <!-- <option value="TRIANGLE_STRIP">gl.TRIANGLE_STRIP</option>
+        <option value="TRIANGLE_FAN">gl.TRIANGLE_FAN</option> -->
+        <option value="TRIANGLES" selected>gl.TRIANGLES</option>
+      </select>
+    </div>
   </body>
 </html>

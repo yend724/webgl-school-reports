@@ -5,12 +5,12 @@ attribute vec4 color;
 varying vec4 vColor;
 
 vec3 rotate(vec3 p, float time){
-    mat3 m = mat3(
-      cos(time), -1.0 * sin(time), 0.0,
-      sin(time), cos(time), 0.0,
-      0.0, 0.0, 1.0
-    );
-    return m * p;
+  mat3 m = mat3(
+    cos(time), -1.0 * sin(time), 0.0,
+    sin(time), cos(time), 0.0,
+    0.0, 0.0, 1.0
+  );
+  return m * p;
 }
 
 void main() {

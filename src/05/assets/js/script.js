@@ -1,24 +1,20 @@
-// = 004 ======================================================================
-// このサンプルは、最初の状態では 003 とまったく同じ内容です。
-// これを、みなさん自身の手で修正を加えて「描かれる図形を五角形に」してみてくだ
-// さい。
-// そんなの余裕じゃろ～ と思うかも知れませんが……結構最初は難しく感じる人も多い
-// かもしれません。なお、正確な正五角形でなくても構いません。
-// ポイントは以下の点を意識すること！
-// * canvas 全体が XY 共に -1.0 ～ 1.0 の空間になっている
-// * gl.TRIANGLES では頂点３個がワンセットで１枚のポリゴンになる
-// * つまりいくつかの頂点は「まったく同じ位置に重複して配置される」ことになる
-// * 頂点座標だけでなく、頂点カラーも同じ個数分必要になる
-// * 物足りない人は、星型や円形などに挑戦してみてもいいかもしれません
-// ============================================================================
-
 // モジュールを読み込み
 import { WebGLUtility } from './webgl.js';
+
+let selectedMode = 'TRIANGLES';
+const handleChangeMode = () => {
+  const $select = document.querySelector('#mode');
+  $select.addEventListener('change', e => {
+    const { currentTarget } = e;
+    selectedMode = currentTarget.value;
+  });
+};
 
 // ドキュメントの読み込みが完了したら実行されるようイベントを設定する
 window.addEventListener(
   'DOMContentLoaded',
   () => {
+    handleChangeMode();
     // アプリケーションのインスタンスを初期化し、必要なリソースをロードする
     const app = new App();
     app.init();
@@ -291,6 +287,10 @@ class App {
     // ロケーションを指定して、uniform 変数の値を更新する（GPU に送る）
     gl.uniform1f(this.uniformLocation.time, nowTime);
     // ドローコール（描画命令）
-    gl.drawArrays(gl.TRIANGLES, 0, this.position.length / this.positionStride);
+    gl.drawArrays(
+      gl[selectedMode],
+      0,
+      this.position.length / this.positionStride
+    );
   }
 }
