@@ -1,5 +1,7 @@
 // モジュールを読み込み
 import { WebGLUtility } from './webgl.js';
+import vertex from '../shader/main.vert';
+import fragment from '../shader/main.frag';
 
 let selectedMode = 'TRIANGLES';
 const handleChangeMode = () => {
@@ -132,29 +134,18 @@ class App {
         const error = new Error('not initialized');
         reject(error);
       } else {
-        let vs = null;
-        let fs = null;
-        // まず頂点シェーダのソースコードを読み込む
-        WebGLUtility.loadFile('./assets/shader/main.vert')
-          .then(vertexShaderSource => {
-            vs = WebGLUtility.createShaderObject(
-              gl,
-              vertexShaderSource,
-              gl.VERTEX_SHADER
-            );
-            return WebGLUtility.loadFile('./assets/shader/main.frag');
-          })
-          .then(fragmentShaderSource => {
-            fs = WebGLUtility.createShaderObject(
-              gl,
-              fragmentShaderSource,
-              gl.FRAGMENT_SHADER
-            );
-            this.program = WebGLUtility.createProgramObject(gl, vs, fs);
-
-            // Promise を解決
-            resolve();
-          });
+        const vs = WebGLUtility.createShaderObject(
+          gl,
+          vertex,
+          gl.VERTEX_SHADER
+        );
+        const fs = WebGLUtility.createShaderObject(
+          gl,
+          fragment,
+          gl.FRAGMENT_SHADER
+        );
+        this.program = WebGLUtility.createProgramObject(gl, vs, fs);
+        resolve();
       }
     });
   }

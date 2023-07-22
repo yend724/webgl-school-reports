@@ -8,4 +8,3 @@ void main() {
   // フラグメントの色
   gl_FragColor = vec4(rgb, vColor.a);
 }
-
