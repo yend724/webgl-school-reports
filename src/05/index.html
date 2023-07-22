@@ -9,15 +9,21 @@
     <style>
       body {
         min-height: 100vh;
-        display: grid;
-        place-items: center;
+      }
+      .wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
       }
       canvas {
         display: block;
-        margin: auto;
       }
       .selectbox {
         position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
       }
       .selectbox::before,
       .selectbox::after {
@@ -62,17 +68,19 @@
     </style>
   </head>
   <body>
-    <canvas id="webgl-canvas"></canvas>
-    <div class="selectbox">
-      <select name="mode" id="mode" class="mode">
-        <!-- <option value="POINTS">gl.POINTS</option> -->
-        <option value="LINE_STRIP">gl.LINE_STRIP</option>
-        <option value="LINE_LOOP">gl.LINE_LOOP</option>
-        <option value="LINES">gl.LINES</option>
-        <!-- <option value="TRIANGLE_STRIP">gl.TRIANGLE_STRIP</option>
+    <div class="wrapper">
+      <canvas id="webgl-canvas"></canvas>
+      <div class="selectbox">
+        <select name="mode" id="mode" class="mode">
+          <!-- <option value="POINTS">gl.POINTS</option> -->
+          <option value="LINE_STRIP">gl.LINE_STRIP</option>
+          <option value="LINE_LOOP">gl.LINE_LOOP</option>
+          <option value="LINES">gl.LINES</option>
+          <!-- <option value="TRIANGLE_STRIP">gl.TRIANGLE_STRIP</option>
         <option value="TRIANGLE_FAN">gl.TRIANGLE_FAN</option> -->
-        <option value="TRIANGLES" selected>gl.TRIANGLES</option>
-      </select>
+          <option value="TRIANGLES" selected>gl.TRIANGLES</option>
+        </select>
+      </div>
     </div>
   </body>
 </html>
