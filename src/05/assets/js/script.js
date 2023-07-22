@@ -234,7 +234,7 @@ class App {
     // ビューポートを設定する
     gl.viewport(0, 0, this.canvas.width, this.canvas.height);
     // クリアする色を設定する（RGBA で 0.0 ～ 1.0 の範囲で指定する）
-    gl.clearColor(0.3, 0.3, 0.3, 1.0);
+    gl.clearColor(0.7, 0.7, 0.7, 1.0);
     // 実際にクリアする（gl.COLOR_BUFFER_BIT で色をクリアしろ、という指定になる）
     gl.clear(gl.COLOR_BUFFER_BIT);
   }
