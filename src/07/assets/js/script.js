@@ -18,7 +18,8 @@ import { WebGLOrbitCamera } from './camera.js';
 import { Pane } from 'tweakpane';
 import vertex from '../shader/main.vert';
 import fragment from '../shader/main.frag';
-import imgUrl from '../img/sample.jpg';
+import img1Url from '../img/img01.png';
+import img2Url from '../img/img02.png';
 
 window.addEventListener(
   'DOMContentLoaded',
@@ -32,15 +33,15 @@ window.addEventListener(
     });
 
     // Tweakpane を使った GUI の設定
-    const pane = new Pane();
-    const parameter = {
-      texture: true,
-    };
+    // const pane = new Pane();
+    // const parameter = {
+    //   texture: true,
+    // };
 
     // テクスチャの表示・非表示 @@@
-    pane.addInput(parameter, 'texture').on('change', v => {
-      app.setTextureVisibility(v.value);
-    });
+    // pane.addInput(parameter, 'texture').on('change', v => {
+    //   app.setTextureVisibility(v.value);
+    // });
   },
   false
 );
@@ -104,6 +105,13 @@ class App {
      */
     this.startTime = null;
     /**
+     * アニメーション
+     * @type {number}
+     */
+    this.progress = 0;
+    this.animateFlg = false;
+    this.animateReverse = false;
+    /**
      * カメラ制御用インスタンス
      * @type {WebGLOrbitCamera}
      */
@@ -112,7 +120,7 @@ class App {
      * テクスチャ格納用
      * @type {WebGLTexture}
      */
-    this.texture = null;
+    this.textures = [];
     /**
      * レンダリングを行うかどうかのフラグ
      * @type {boolean}
@@ -126,6 +134,7 @@ class App {
 
     // this を固定するためのバインド処理
     this.resize = this.resize.bind(this);
+    this.animate = this.animate.bind(this);
     this.render = this.render.bind(this);
   }
 
@@ -192,6 +201,9 @@ class App {
     // リサイズイベントの設定
     window.addEventListener('resize', this.resize, false);
 
+    // アニメーション
+    this.canvas.addEventListener('click', this.animate, false);
+
     // 深度テストは初期状態で有効
     this.gl.enable(this.gl.DEPTH_TEST);
   }
@@ -202,6 +214,32 @@ class App {
   resize() {
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
+  }
+
+  animate() {
+    if (this.animateFlg) {
+      return;
+    }
+
+    this.animateFlg = true;
+    const delta = this.animateReverse ? -0.01 : 0.01;
+    const loop = () => {
+      this.progress += delta;
+      if (this.progress >= 1) {
+        this.progress = 1;
+        this.animateFlg = false;
+        this.animateReverse = true;
+        return;
+      }
+      if (this.progress <= 0) {
+        this.progress = 0;
+        this.animateFlg = false;
+        this.animateReverse = false;
+        return;
+      }
+      requestAnimationFrame(loop);
+    };
+    loop();
   }
 
   /**
@@ -226,11 +264,14 @@ class App {
           gl.FRAGMENT_SHADER
         );
         this.program = WebGLUtility.createProgramObject(gl, vs, fs);
-        WebGLUtility.loadImage(imgUrl).then(image => {
-          // 読み込んだ画像からテクスチャを生成 @@@
-          this.texture = WebGLUtility.createTexture(gl, image);
 
-          // Promise を解決
+        const loadImages = [img1Url, img2Url].map((imgUrl, i) => {
+          return WebGLUtility.loadImage(imgUrl).then(image => {
+            // 読み込んだ画像からテクスチャを生成 @@@
+            this.textures[i] = WebGLUtility.createTexture(gl, image);
+          });
+        });
+        Promise.all(loadImages).then(() => {
           resolve();
         });
       }
@@ -242,7 +283,7 @@ class App {
    */
   setupGeometry() {
     // プレーンジオメトリの情報を取得
-    const size = 2.0;
+    const size = 3.0;
     const color = [1.0, 1.0, 1.0, 1.0];
     this.planeGeometry = WebGLGeometry.plane(size, size, color);
 
@@ -266,7 +307,7 @@ class App {
       gl.getAttribLocation(this.program, 'position'),
       gl.getAttribLocation(this.program, 'normal'),
       gl.getAttribLocation(this.program, 'color'),
-      gl.getAttribLocation(this.program, 'texCoord'), // テクスチャ座標 @@@
+      gl.getAttribLocation(this.program, 'texCoord'),
     ];
     // attribute のストライド
     this.attributeStride = [
@@ -279,7 +320,10 @@ class App {
     this.uniformLocation = {
       mvpMatrix: gl.getUniformLocation(this.program, 'mvpMatrix'),
       normalMatrix: gl.getUniformLocation(this.program, 'normalMatrix'),
-      textureUnit: gl.getUniformLocation(this.program, 'textureUnit'), // uniform 変数のロケーション @@@
+      time: gl.getUniformLocation(this.program, 'time'),
+      progress: gl.getUniformLocation(this.program, 'progress'),
+      textureUnit1: gl.getUniformLocation(this.program, 'textureUnit1'),
+      textureUnit2: gl.getUniformLocation(this.program, 'textureUnit2'),
     };
   }
 
@@ -353,11 +397,17 @@ class App {
     // モデル座標変換行列の、逆転置行列を生成する
     const normalMatrix = m4.transpose(m4.inverse(m));
 
-    // フラグの状態に応じてテクスチャを０番ユニットにバインドする @@@
+    // 0番ユニットにバインドする
     gl.activeTexture(gl.TEXTURE0);
-    if (this.textureVisibility === true) {
-      gl.bindTexture(gl.TEXTURE_2D, this.texture);
-    } else {
+    gl.bindTexture(gl.TEXTURE_2D, this.textures[0]);
+    if (this.textureVisibility === false) {
+      gl.bindTexture(gl.TEXTURE_2D, null);
+    }
+
+    // 1番ユニットにバインドする
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, this.textures[1]);
+    if (this.textureVisibility === false) {
       gl.bindTexture(gl.TEXTURE_2D, null);
     }
 
@@ -365,7 +415,10 @@ class App {
     gl.useProgram(this.program);
     gl.uniformMatrix4fv(this.uniformLocation.mvpMatrix, false, mvp);
     gl.uniformMatrix4fv(this.uniformLocation.normalMatrix, false, normalMatrix);
-    gl.uniform1i(this.uniformLocation.textureUnit, 0); // テクスチャユニットの番号を送る @@@
+    gl.uniform1f(this.uniformLocation.time, nowTime);
+    gl.uniform1f(this.uniformLocation.progress, this.progress);
+    gl.uniform1i(this.uniformLocation.textureUnit1, 0);
+    gl.uniform1i(this.uniformLocation.textureUnit2, 1);
 
     // VBO と IBO を設定し、描画する
     WebGLUtility.enableBuffer(
