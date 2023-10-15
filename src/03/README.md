@@ -6,6 +6,5 @@
 ## 課題要件
 地球上を飛ぶ旅客機（を模したBoxやPlane等で可）の動きを実現する。
 
-
 ## URL
 https://webgl-school-reports.yend.dev/03/

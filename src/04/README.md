@@ -6,6 +6,5 @@
 ## 課題要件
 RaycasterとPlane（板）を使ってなにか作ってみる。
 
-
 ## URL
 https://webgl-school-reports.yend.dev/04/

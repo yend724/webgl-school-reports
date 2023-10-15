@@ -6,6 +6,5 @@
 ## 課題要件
 ネイティブなWebGL APIを使用して五角形を作る
 
-
 ## URL
 https://webgl-school-reports.yend.dev/05/
