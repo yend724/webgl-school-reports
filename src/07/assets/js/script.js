@@ -283,7 +283,7 @@ class App {
    */
   setupGeometry() {
     // プレーンジオメトリの情報を取得
-    const size = 3.0;
+    const size = 2.0;
     const color = [1.0, 1.0, 1.0, 1.0];
     this.planeGeometry = WebGLGeometry.plane(size, size, color);
 
