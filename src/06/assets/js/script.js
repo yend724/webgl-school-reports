@@ -24,7 +24,8 @@ window.addEventListener(
       culling: true,
       depthTest: true,
       rotation: false,
-      color: 'rgb(255, 255, 255)',
+      lightColor1: 'rgb(255, 0, 0)',
+      lightColor2: 'rgb(0, 0, 255)',
     };
 
     // バックフェイスカリングの有効・無効
@@ -40,8 +41,11 @@ window.addEventListener(
       app.setRotation(v.value);
     });
     // ライトの色
-    pane.addInput(parameter, 'color').on('change', v => {
-      app.setColor(v.value);
+    pane.addInput(parameter, 'lightColor1').on('change', v => {
+      app.setColor1(v.value);
+    });
+    pane.addInput(parameter, 'lightColor2').on('change', v => {
+      app.setColor2(v.value);
     });
   },
   false
@@ -124,7 +128,8 @@ class App {
      * オブジェクトを Y 軸回転させるかどうか
      * @type {boolean}
      */
-    this.color = [1.0, 1.0, 1.0];
+    this.color1 = [1.0, 0.0, 0.0];
+    this.color2 = [0.0, 0.0, 1.0];
 
     // this を固定するためのバインド処理
     this.resize = this.resize.bind(this);
@@ -175,13 +180,21 @@ class App {
    * カラーコード を設定する
    * @param {string} color - 設定する値
    */
-  setColor(color) {
+  setColor1(color) {
     const regex = /rgb\((\d+),\s*(\d+),\s*(\d+)\)/;
     const match = color.match(regex);
     const red = parseInt(match[1]);
     const green = parseInt(match[2]);
     const blue = parseInt(match[3]);
-    this.color = [red / 255, green / 255, blue / 255];
+    this.color1 = [red / 255, green / 255, blue / 255];
+  }
+  setColor2(color) {
+    const regex = /rgb\((\d+),\s*(\d+),\s*(\d+)\)/;
+    const match = color.match(regex);
+    const red = parseInt(match[1]);
+    const green = parseInt(match[2]);
+    const blue = parseInt(match[3]);
+    this.color2 = [red / 255, green / 255, blue / 255];
   }
 
   /**
@@ -200,6 +213,11 @@ class App {
       move: 2.0, // 右ボタンで平行移動する際の速度係数
     };
     this.camera = new WebGLOrbitCamera(this.canvas, cameraOption);
+    this.camera.defaultPosition = WebGLMath.Vec3.create(
+      0.0,
+      3.0,
+      this.distance
+    );
 
     // 最初に一度リサイズ処理を行っておく
     this.resize();
@@ -285,7 +303,7 @@ class App {
       gl.getAttribLocation(this.program, 'normal'),
       gl.getAttribLocation(this.program, 'color'),
       gl.getAttribLocation(this.program, 'time'),
-      gl.getAttribLocation(this.program, 'ligthColor'),
+      gl.getAttribLocation(this.program, 'lightColor'),
     ];
     // attribute のストライド
     this.attributeStride = [3, 3, 4];
@@ -294,7 +312,8 @@ class App {
       mvpMatrix: gl.getUniformLocation(this.program, 'mvpMatrix'),
       normalMatrix: gl.getUniformLocation(this.program, 'normalMatrix'), // 法線変換行列
       time: gl.getUniformLocation(this.program, 'time'), // 時間
-      lightColor: gl.getUniformLocation(this.program, 'ligthColor'),
+      lightColor1: gl.getUniformLocation(this.program, 'lightColor1'),
+      lightColor2: gl.getUniformLocation(this.program, 'lightColor2'),
     };
   }
 
@@ -377,7 +396,8 @@ class App {
     gl.uniformMatrix4fv(this.uniformLocation.mvpMatrix, false, mvp);
     gl.uniformMatrix4fv(this.uniformLocation.normalMatrix, false, normalMatrix);
     gl.uniform1f(this.uniformLocation.time, nowTime);
-    gl.uniform3fv(this.uniformLocation.lightColor, this.color);
+    gl.uniform3fv(this.uniformLocation.lightColor1, this.color1);
+    gl.uniform3fv(this.uniformLocation.lightColor2, this.color2);
 
     // VBO と IBO を設定し、描画する
     WebGLUtility.enableBuffer(
