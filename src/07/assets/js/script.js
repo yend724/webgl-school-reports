@@ -31,17 +31,6 @@ window.addEventListener(
       app.setupLocation();
       app.start();
     });
-
-    // Tweakpane を使った GUI の設定
-    // const pane = new Pane();
-    // const parameter = {
-    //   texture: true,
-    // };
-
-    // テクスチャの表示・非表示 @@@
-    // pane.addInput(parameter, 'texture').on('change', v => {
-    //   app.setTextureVisibility(v.value);
-    // });
   },
   false
 );
@@ -109,7 +98,7 @@ class App {
      * @type {number}
      */
     this.progress = 0;
-    this.animateFlg = false;
+    this.animateRunning = false;
     this.animateReverse = false;
     /**
      * カメラ制御用インスタンス
@@ -217,28 +206,28 @@ class App {
   }
 
   animate() {
-    if (this.animateFlg) {
+    if (this.animateRunning) {
       return;
     }
 
-    this.animateFlg = true;
-    const delta = this.animateReverse ? -0.01 : 0.01;
+    const duration = 600;
+    const startTime = Date.now() - 0.016;
+    this.animateRunning = true;
+
     const loop = () => {
-      this.progress += delta;
-      if (this.progress >= 1) {
-        this.progress = 1;
-        this.animateFlg = false;
-        this.animateReverse = true;
-        return;
+      const now = Date.now();
+      const progress = Math.min(1, (now - startTime) / duration);
+      this.progress = this.animateReverse ? 1 - progress : progress;
+
+      if (this.progress >= 1 || this.progress <= 0) {
+        this.progress = this.progress >= 1 ? 1 : 0;
+        this.animateRunning = false;
+        this.animateReverse = !this.animateReverse;
+      } else {
+        requestAnimationFrame(loop);
       }
-      if (this.progress <= 0) {
-        this.progress = 0;
-        this.animateFlg = false;
-        this.animateReverse = false;
-        return;
-      }
-      requestAnimationFrame(loop);
     };
+
     loop();
   }
 
