@@ -20,6 +20,8 @@ import vertex from '../shader/main.vert';
 import fragment from '../shader/main.frag';
 import img1Url from '../img/img01.png';
 import img2Url from '../img/img02.png';
+import imgNoiseUrl from '../img/noise.png';
+import { gsap } from 'gsap';
 
 window.addEventListener(
   'DOMContentLoaded',
@@ -95,9 +97,11 @@ class App {
     this.startTime = null;
     /**
      * アニメーション
-     * @type {number}
+     * @type {{value: number}} progress.value - 進捗率の値
      */
-    this.progress = 0;
+    this.progress = {
+      value: 0,
+    };
     this.animateRunning = false;
     this.animateReverse = false;
     /**
@@ -210,25 +214,15 @@ class App {
       return;
     }
 
-    const duration = 600;
-    const startTime = Date.now() - 0.016;
     this.animateRunning = true;
-
-    const loop = () => {
-      const now = Date.now();
-      const progress = Math.min(1, (now - startTime) / duration);
-      this.progress = this.animateReverse ? 1 - progress : progress;
-
-      if (this.progress >= 1 || this.progress <= 0) {
-        this.progress = this.progress >= 1 ? 1 : 0;
+    const targetValue = this.progress.value === 1 ? 0 : 1;
+    gsap.to(this.progress, {
+      value: targetValue,
+      duration: 1,
+      onComplete: () => {
         this.animateRunning = false;
-        this.animateReverse = !this.animateReverse;
-      } else {
-        requestAnimationFrame(loop);
-      }
-    };
-
-    loop();
+      },
+    });
   }
 
   /**
@@ -254,7 +248,7 @@ class App {
         );
         this.program = WebGLUtility.createProgramObject(gl, vs, fs);
 
-        const loadImages = [img1Url, img2Url].map((imgUrl, i) => {
+        const loadImages = [img1Url, img2Url, imgNoiseUrl].map((imgUrl, i) => {
           return WebGLUtility.loadImage(imgUrl).then(image => {
             // 読み込んだ画像からテクスチャを生成 @@@
             this.textures[i] = WebGLUtility.createTexture(gl, image);
@@ -313,6 +307,7 @@ class App {
       progress: gl.getUniformLocation(this.program, 'progress'),
       textureUnit1: gl.getUniformLocation(this.program, 'textureUnit1'),
       textureUnit2: gl.getUniformLocation(this.program, 'textureUnit2'),
+      textureNoise: gl.getUniformLocation(this.program, 'textureNoise'),
     };
   }
 
@@ -400,14 +395,22 @@ class App {
       gl.bindTexture(gl.TEXTURE_2D, null);
     }
 
+    // 2番ユニットにバインドする
+    gl.activeTexture(gl.TEXTURE2);
+    gl.bindTexture(gl.TEXTURE_2D, this.textures[2]);
+    if (this.textureVisibility === false) {
+      gl.bindTexture(gl.TEXTURE_2D, null);
+    }
+
     // プログラムオブジェクトを選択し uniform 変数を更新する
     gl.useProgram(this.program);
     gl.uniformMatrix4fv(this.uniformLocation.mvpMatrix, false, mvp);
     gl.uniformMatrix4fv(this.uniformLocation.normalMatrix, false, normalMatrix);
     gl.uniform1f(this.uniformLocation.time, nowTime);
-    gl.uniform1f(this.uniformLocation.progress, this.progress);
+    gl.uniform1f(this.uniformLocation.progress, this.progress.value);
     gl.uniform1i(this.uniformLocation.textureUnit1, 0);
     gl.uniform1i(this.uniformLocation.textureUnit2, 1);
+    gl.uniform1i(this.uniformLocation.textureNoise, 2);
 
     // VBO と IBO を設定し、描画する
     WebGLUtility.enableBuffer(
