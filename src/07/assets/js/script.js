@@ -15,12 +15,10 @@ import { WebGLUtility } from './webgl.js';
 import { WebGLMath } from './math.js';
 import { WebGLGeometry } from './geometry.js';
 import { WebGLOrbitCamera } from './camera.js';
-import { Pane } from 'tweakpane';
 import vertex from '../shader/main.vert';
 import fragment from '../shader/main.frag';
 import img1Url from '../img/img01.png';
 import img2Url from '../img/img02.png';
-import imgNoiseUrl from '../img/noise.png';
 import { gsap } from 'gsap';
 
 window.addEventListener(
@@ -96,14 +94,21 @@ class App {
      */
     this.startTime = null;
     /**
-     * アニメーション
+     * アニメーション進捗率
      * @type {{value: number}} progress.value - 進捗率の値
      */
     this.progress = {
       value: 0,
     };
-    this.animateRunning = false;
-    this.animateReverse = false;
+    /**
+     * アニメーションの起点
+     * @type {{x: number}} point.x - xの値
+     * @type {{y: number}} point.y - yの値
+     */
+    this.point = {
+      x: 0,
+      y: 0,
+    };
     /**
      * カメラ制御用インスタンス
      * @type {WebGLOrbitCamera}
@@ -127,7 +132,7 @@ class App {
 
     // this を固定するためのバインド処理
     this.resize = this.resize.bind(this);
-    this.animate = this.animate.bind(this);
+    this.animation = this.animation.bind(this);
     this.render = this.render.bind(this);
   }
 
@@ -180,11 +185,13 @@ class App {
     this.gl = WebGLUtility.createWebGLContext(this.canvas);
 
     // カメラ制御用インスタンスを生成する
+    const fov = 45;
+    const fovRad = (fov / 2) * (Math.PI / 180);
+    const dist = 2.0 / 2 / Math.tan(fovRad);
     const cameraOption = {
-      distance: 5.0, // Z 軸上の初期位置までの距離
-      min: 1.0, // カメラが寄れる最小距離
-      max: 10.0, // カメラが離れられる最大距離
-      move: 2.0, // 右ボタンで平行移動する際の速度係数
+      distance: dist, // Z 軸上の初期位置までの距離
+      min: dist, // カメラが寄れる最小距離
+      max: dist, // カメラが離れられる最大距離
     };
     this.camera = new WebGLOrbitCamera(this.canvas, cameraOption);
 
@@ -195,7 +202,7 @@ class App {
     window.addEventListener('resize', this.resize, false);
 
     // アニメーション
-    this.canvas.addEventListener('click', this.animate, false);
+    this.canvas.addEventListener('click', this.animation, false);
 
     // 深度テストは初期状態で有効
     this.gl.enable(this.gl.DEPTH_TEST);
@@ -205,24 +212,31 @@ class App {
    * リサイズ処理
    */
   resize() {
-    this.canvas.width = window.innerWidth;
-    this.canvas.height = window.innerHeight;
+    const size = Math.min(window.innerHeight, window.innerWidth) - 32;
+    this.canvas.width = size;
+    this.canvas.height = size;
   }
 
-  animate() {
-    if (this.animateRunning) {
+  animation(e) {
+    const progress = this.progress.value;
+    if (progress !== 0 && progress !== 1) {
       return;
     }
 
-    this.animateRunning = true;
-    const targetValue = this.progress.value === 1 ? 0 : 1;
+    const nextValue = progress === 1 ? 0 : 1;
     gsap.to(this.progress, {
-      value: targetValue,
+      value: nextValue,
       duration: 1,
-      onComplete: () => {
-        this.animateRunning = false;
-      },
     });
+
+    const target = e.currentTarget;
+    const rect = target.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / this.canvas.width;
+    const y = (e.clientY - rect.top) / this.canvas.height;
+    this.point = {
+      x,
+      y,
+    };
   }
 
   /**
@@ -248,7 +262,7 @@ class App {
         );
         this.program = WebGLUtility.createProgramObject(gl, vs, fs);
 
-        const loadImages = [img1Url, img2Url, imgNoiseUrl].map((imgUrl, i) => {
+        const loadImages = [img1Url, img2Url].map((imgUrl, i) => {
           return WebGLUtility.loadImage(imgUrl).then(image => {
             // 読み込んだ画像からテクスチャを生成 @@@
             this.textures[i] = WebGLUtility.createTexture(gl, image);
@@ -269,7 +283,6 @@ class App {
     const size = 2.0;
     const color = [1.0, 1.0, 1.0, 1.0];
     this.planeGeometry = WebGLGeometry.plane(size, size, color);
-
     // VBO と IBO を生成する
     this.planeVBO = [
       WebGLUtility.createVBO(this.gl, this.planeGeometry.position),
@@ -307,7 +320,7 @@ class App {
       progress: gl.getUniformLocation(this.program, 'progress'),
       textureUnit1: gl.getUniformLocation(this.program, 'textureUnit1'),
       textureUnit2: gl.getUniformLocation(this.program, 'textureUnit2'),
-      textureNoise: gl.getUniformLocation(this.program, 'textureNoise'),
+      point: gl.getUniformLocation(this.program, 'point'),
     };
   }
 
@@ -319,7 +332,7 @@ class App {
     // ビューポートを設定する
     gl.viewport(0, 0, this.canvas.width, this.canvas.height);
     // クリアする色と深度を設定する
-    gl.clearColor(0.3, 0.3, 0.3, 1.0);
+    gl.clearColor(1.0, 0.0, 0.0, 1.0);
     gl.clearDepth(1.0);
     // 色と深度をクリアする
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -350,7 +363,6 @@ class App {
   render() {
     const gl = this.gl;
     const m4 = WebGLMath.Mat4;
-    const v3 = WebGLMath.Vec3;
 
     // レンダリングのフラグの状態を見て、requestAnimationFrame を呼ぶか決める
     if (this.isRender === true) {
@@ -369,7 +381,7 @@ class App {
     // ビュー・プロジェクション座標変換行列
     const v = this.camera.update();
     const fovy = 45;
-    const aspect = window.innerWidth / window.innerHeight;
+    const aspect = this.canvas.width / this.canvas.height;
     const near = 0.1;
     const far = 10.0;
     const p = m4.perspective(fovy, aspect, near, far);
@@ -410,7 +422,7 @@ class App {
     gl.uniform1f(this.uniformLocation.progress, this.progress.value);
     gl.uniform1i(this.uniformLocation.textureUnit1, 0);
     gl.uniform1i(this.uniformLocation.textureUnit2, 1);
-    gl.uniform1i(this.uniformLocation.textureNoise, 2);
+    gl.uniform2f(this.uniformLocation.point, this.point.x, this.point.y);
 
     // VBO と IBO を設定し、描画する
     WebGLUtility.enableBuffer(

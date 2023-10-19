@@ -1,11 +1,10 @@
-
 import { WebGLMath } from './math.js';
 
 // 短く書けるようにローカル変数に入れておく
 const Vec2 = WebGLMath.Vec2;
 const Vec3 = WebGLMath.Vec3;
 const Mat4 = WebGLMath.Mat4;
-const Qtn  = WebGLMath.Qtn;
+const Qtn = WebGLMath.Qtn;
 
 /**
  * three.js の OrbitControls に似た挙動のカメラ操作用ユーティリティクラス
@@ -13,13 +12,21 @@ const Qtn  = WebGLMath.Qtn;
  */
 export class WebGLOrbitCamera {
   /** @type {number} */
-  static get DEFAULT_DISTANCE() {return 5.0;};
+  static get DEFAULT_DISTANCE() {
+    return 5.0;
+  }
   /** @type {number} */
-  static get DEFAULT_MIN_DISTANCE() {return 1.0;};
+  static get DEFAULT_MIN_DISTANCE() {
+    return 1.0;
+  }
   /** @type {number} */
-  static get DEFAULT_MAX_DISTANCE() {return 10.0;};
+  static get DEFAULT_MAX_DISTANCE() {
+    return 10.0;
+  }
   /** @type {number} */
-  static get DEFAULT_MOVE_SCALE() {return 2.0;};
+  static get DEFAULT_MOVE_SCALE() {
+    return 2.0;
+  }
 
   /**
    * @constructor
@@ -31,42 +38,50 @@ export class WebGLOrbitCamera {
    * @property {number} option.move - カメラが平行移動する際のスケール
    */
   constructor(target, option = {}) {
-    this.target             = target;
-    this.distance           = option.distance || WebGLOrbitCamera.DEFAULT_DISTANCE;
-    this.minDistance        = option.min || WebGLOrbitCamera.DEFAULT_MIN_DISTANCE;
-    this.maxDistance        = option.max || WebGLOrbitCamera.DEFAULT_MAX_DISTANCE;
-    this.moveScale          = option.move || WebGLOrbitCamera.DEFAULT_MOVE_SCALE;
-    this.position           = Vec3.create(0.0, 0.0, this.distance);
-    this.center             = Vec3.create(0.0, 0.0, 0.0);
-    this.upDirection        = Vec3.create(0.0, 1.0, 0.0);
-    this.defaultPosition    = Vec3.create(0.0, 0.0, this.distance);
-    this.defaultCenter      = Vec3.create(0.0, 0.0, 0.0);
+    this.target = target;
+    this.distance = option.distance || WebGLOrbitCamera.DEFAULT_DISTANCE;
+    this.minDistance = option.min || WebGLOrbitCamera.DEFAULT_MIN_DISTANCE;
+    this.maxDistance = option.max || WebGLOrbitCamera.DEFAULT_MAX_DISTANCE;
+    this.moveScale = option.move || WebGLOrbitCamera.DEFAULT_MOVE_SCALE;
+    this.position = Vec3.create(0.0, 0.0, this.distance);
+    this.center = Vec3.create(0.0, 0.0, 0.0);
+    this.upDirection = Vec3.create(0.0, 1.0, 0.0);
+    this.defaultPosition = Vec3.create(0.0, 0.0, this.distance);
+    this.defaultCenter = Vec3.create(0.0, 0.0, 0.0);
     this.defaultUpDirection = Vec3.create(0.0, 1.0, 0.0);
-    this.movePosition       = Vec3.create(0.0, 0.0, 0.0);
-    this.rotateX            = 0.0;
-    this.rotateY            = 0.0;
-    this.scale              = 0.0;
-    this.isDown             = false;
-    this.prevPosition       = Vec2.create(0, 0);
-    this.offsetPosition     = Vec2.create(0, 0);
-    this.qt                 = Qtn.create();
-    this.qtx                = Qtn.create();
-    this.qty                = Qtn.create();
+    this.movePosition = Vec3.create(0.0, 0.0, 0.0);
+    this.rotateX = 0.0;
+    this.rotateY = 0.0;
+    this.scale = 0.0;
+    this.isDown = false;
+    this.prevPosition = Vec2.create(0, 0);
+    this.offsetPosition = Vec2.create(0, 0);
+    this.qt = Qtn.create();
+    this.qtx = Qtn.create();
+    this.qty = Qtn.create();
 
     // self binding
     this.mouseInteractionStart = this.mouseInteractionStart.bind(this);
-    this.mouseInteractionMove  = this.mouseInteractionMove.bind(this);
-    this.mouseInteractionEnd   = this.mouseInteractionEnd.bind(this);
-    this.wheelScroll           = this.wheelScroll.bind(this);
+    this.mouseInteractionMove = this.mouseInteractionMove.bind(this);
+    this.mouseInteractionEnd = this.mouseInteractionEnd.bind(this);
+    this.wheelScroll = this.wheelScroll.bind(this);
 
     // event
-    this.target.addEventListener('mousedown', this.mouseInteractionStart, false);
-    this.target.addEventListener('mousemove', this.mouseInteractionMove,  false);
-    this.target.addEventListener('mouseup',   this.mouseInteractionEnd,   false);
-    this.target.addEventListener('wheel',     this.wheelScroll,           false);
-    this.target.addEventListener('contextmenu', (event) => {
-      event.preventDefault();
-    }, false);
+    this.target.addEventListener(
+      'mousedown',
+      this.mouseInteractionStart,
+      false
+    );
+    this.target.addEventListener('mousemove', this.mouseInteractionMove, false);
+    this.target.addEventListener('mouseup', this.mouseInteractionEnd, false);
+    this.target.addEventListener('wheel', this.wheelScroll, false);
+    this.target.addEventListener(
+      'contextmenu',
+      event => {
+        event.preventDefault();
+      },
+      false
+    );
   }
 
   /**
@@ -77,7 +92,7 @@ export class WebGLOrbitCamera {
     const bound = this.target.getBoundingClientRect();
     this.prevPosition = Vec2.create(
       event.clientX - bound.left,
-      event.clientY - bound.top,
+      event.clientY - bound.top
     );
   }
 
@@ -85,7 +100,9 @@ export class WebGLOrbitCamera {
    * マウスが移動した際のイベント
    */
   mouseInteractionMove(event) {
-    if (this.isDown !== true) {return;}
+    if (this.isDown !== true) {
+      return;
+    }
     const bound = this.target.getBoundingClientRect();
     const w = bound.width;
     const h = bound.height;
@@ -94,7 +111,7 @@ export class WebGLOrbitCamera {
     const s = 1.0 / Math.min(w, h);
     this.offsetPosition = Vec2.create(
       x - this.prevPosition[0],
-      y - this.prevPosition[1],
+      y - this.prevPosition[1]
     );
     this.prevPosition = Vec2.create(x, y);
     switch (event.buttons) {
@@ -108,7 +125,7 @@ export class WebGLOrbitCamera {
         const eyeOffset = Vec3.create(
           this.offsetPosition[0],
           -this.offsetPosition[1],
-          0.0,
+          0.0
         );
         const rotateEye = Qtn.toVecIII(eyeOffset, this.qt);
         this.movePosition[0] -= rotateEye[0] * s * this.moveScale;
@@ -148,16 +165,19 @@ export class WebGLOrbitCamera {
     // scale
     this.scale *= 0.7;
     this.distance += this.scale;
-    this.distance = Math.min(Math.max(this.distance, this.minDistance), this.maxDistance);
+    this.distance = Math.min(
+      Math.max(this.distance, this.minDistance),
+      this.maxDistance
+    );
     this.defaultPosition[2] = this.distance;
     // rotate
     Qtn.identity(this.qt);
     Qtn.identity(this.qtx);
     Qtn.identity(this.qty);
-    Qtn.rotate(this.rotateX * PI2, u, this.qtx);
+    // Qtn.rotate(this.rotateX * PI2, u, this.qtx);
     Qtn.toVecIII(v, this.qtx, v);
-    Qtn.rotate(this.rotateY * PI2, v, this.qty);
-    Qtn.multiply(this.qtx, this.qty, this.qt)
+    // Qtn.rotate(this.rotateY * PI2, v, this.qty);
+    Qtn.multiply(this.qtx, this.qty, this.qt);
     Qtn.toVecIII(this.defaultPosition, this.qt, this.position);
     Qtn.toVecIII(this.defaultUpDirection, this.qt, this.upDirection);
     // translate
@@ -171,4 +191,3 @@ export class WebGLOrbitCamera {
     return Mat4.lookAt(this.position, this.center, this.upDirection);
   }
 }
-

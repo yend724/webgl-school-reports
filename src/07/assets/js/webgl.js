@@ -87,7 +87,6 @@ export class WebGLUtility {
       return shader;
     } else {
       throw new Error(gl.getShaderInfoLog(shader));
-      return null;
     }
   }
 
@@ -115,7 +114,6 @@ export class WebGLUtility {
       return program;
     } else {
       throw new Error(gl.getProgramInfoLog(program));
-      return null;
     }
   }
 
