@@ -8,7 +8,6 @@ uniform sampler2D textureUnit2; // テクスチャ2
 varying vec4 vColor;
 varying vec2 vTexCoord;
 
-
 void main() {
   vec2 uv = vTexCoord;
   vec2 dir = uv - vec2(point);

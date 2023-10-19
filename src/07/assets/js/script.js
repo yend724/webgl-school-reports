@@ -119,6 +119,7 @@ class App {
      * @type {WebGLTexture}
      */
     this.textures = [];
+    this.visibleTextureIndex = 0;
     /**
      * レンダリングを行うかどうかのフラグ
      * @type {boolean}
@@ -222,11 +223,13 @@ class App {
     if (progress !== 0 && progress !== 1) {
       return;
     }
-
-    const nextValue = progress === 1 ? 0 : 1;
     gsap.to(this.progress, {
-      value: nextValue,
+      value: 1,
       duration: 1,
+      onComplete: () => {
+        this.progress.value = 0;
+        this.visibleTextureIndex = this.visibleTextureIndex === 0 ? 1 : 0;
+      },
     });
 
     const target = e.currentTarget;
@@ -407,21 +410,20 @@ class App {
       gl.bindTexture(gl.TEXTURE_2D, null);
     }
 
-    // 2番ユニットにバインドする
-    gl.activeTexture(gl.TEXTURE2);
-    gl.bindTexture(gl.TEXTURE_2D, this.textures[2]);
-    if (this.textureVisibility === false) {
-      gl.bindTexture(gl.TEXTURE_2D, null);
-    }
-
     // プログラムオブジェクトを選択し uniform 変数を更新する
     gl.useProgram(this.program);
     gl.uniformMatrix4fv(this.uniformLocation.mvpMatrix, false, mvp);
     gl.uniformMatrix4fv(this.uniformLocation.normalMatrix, false, normalMatrix);
     gl.uniform1f(this.uniformLocation.time, nowTime);
     gl.uniform1f(this.uniformLocation.progress, this.progress.value);
-    gl.uniform1i(this.uniformLocation.textureUnit1, 0);
-    gl.uniform1i(this.uniformLocation.textureUnit2, 1);
+    gl.uniform1i(
+      this.uniformLocation.textureUnit1,
+      this.visibleTextureIndex % 2
+    );
+    gl.uniform1i(
+      this.uniformLocation.textureUnit2,
+      (this.visibleTextureIndex + 1) % 2
+    );
     gl.uniform2f(this.uniformLocation.point, this.point.x, this.point.y);
 
     // VBO と IBO を設定し、描画する
